@@ -1,8 +1,10 @@
-package com.rinha.de.backend;
+package com.rinha.de.backend.controller;
 
 import com.rinha.de.backend.dto.RequestDto;
 import com.rinha.de.backend.service.PessoaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,12 +16,14 @@ import java.net.URI;
 public class PessoaController {
 
     private final PessoaService service;
+
     @GetMapping("/pessoas")
     public ResponseEntity<?> getPessoasByTermo(@RequestParam String t){
         var response = service.getByTermo(t);
         return ResponseEntity.ok(response);
     }
 
+    @Cacheable(value = "pessoas")
     @GetMapping("/pessoas/{id}")
     public ResponseEntity<?> getPessoas(@PathVariable(value = "id") String id){
         var response = service.getPessoas(id);
@@ -27,6 +31,7 @@ public class PessoaController {
         return response != null ? ResponseEntity.ok(response) : ResponseEntity.notFound().build();
     }
 
+    @CacheEvict(value = "pessoas", allEntries = true)
     @PostMapping("/pessoas")
     public ResponseEntity<?> createPessoa(@Valid @RequestBody RequestDto pessoa){
         var response = service.createPessoa(pessoa);

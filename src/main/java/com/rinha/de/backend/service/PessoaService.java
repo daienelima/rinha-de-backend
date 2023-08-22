@@ -27,6 +27,7 @@ public class PessoaService {
     public int count(){
         return repository.countAllById();
     }
+
     public ResponseDto getPessoas(String id){
         var pessoa = repository.findById(id);
         if(pessoa.isPresent()) {
